@@ -1,0 +1,42 @@
+.apod {
+  display: grid;
+  grid-template-columns: 40px 1fr;
+
+  overflow: hidden;
+
+  border-radius: 0.25rem;
+  border: 1px solid #d6dbdf;
+
+  @apply w-full md:w-[640px]
+}
+
+.apod-sidebar-heart {
+  width: min-content;
+  margin: 10px auto;
+
+  color: #8c8d8d;
+
+  transition: all;
+}
+
+.apod-sidebar-heart:hover {
+  cursor: pointer;
+  color: red;
+}
+
+.apod-sidebar-heart-liked svg {
+  color: red;
+  fill: red;
+}
+
+@keyframes like-animation {
+  40% {
+    width: 30px;
+    height: 30px;
+  }
+
+  100% {
+    width: 25px;
+    height: 25px;
+  }
+}
