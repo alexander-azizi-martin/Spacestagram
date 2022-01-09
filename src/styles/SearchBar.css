@@ -1,0 +1,46 @@
+.search-bar {
+  display: flex;
+  align-items: center;
+
+  height: 44px;
+  padding: 0 15px;
+
+  color: #8c8d8d;
+  background-color: #f6f7f8;
+  border: 1px solid #eff1f2;
+  border-radius: 4px;
+}
+
+.search-bar-input {
+  width: 100%;
+  height: 34px;
+
+  font-size: 14px;
+
+  border: none;
+  background-color: #f6f7f8;
+}
+
+.search-bar-input:focus {
+  outline: none;
+}
+
+/* Styling for when the search bar is hovered or goes into focus. */
+
+.search-bar:hover {
+  outline: 1px solid blue;
+  background-color: white;
+}
+
+.search-bar:hover .search-bar-input {
+  background-color: white;
+}
+
+.search-bar-focus {
+  outline: 1px solid blue;
+  background-color: white;
+}
+
+.search-bar-focus .search-bar-input {
+  background-color: white;
+}
