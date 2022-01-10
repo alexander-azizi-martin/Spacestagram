@@ -1,8 +1,9 @@
-import React, { MouseEvent } from 'react';
-import dayjs from 'dayjs';
-import { APODData } from '~/types';
+import React, { MouseEvent, useState } from 'react';
+import ReactPlayer from 'react-player';
 import { Heart } from 'react-feather';
+import dayjs from 'dayjs';
 import { useStore } from '~/utils/store';
+import { APODData } from '~/types';
 import '~/styles/APOD.css';
 
 type APODProps = {
@@ -15,9 +16,9 @@ function APOD({ apodData }: APODProps) {
     state.likeApod,
     state.unlikeApod,
   ]);
-  
+
   const handleClick = (event: MouseEvent) => {
-    const isLicked = likedApods.find((apodDate) => apodDate == apodData.date);
+    const isLicked = likedApods.has(apodData.date);
 
     if (isLicked) {
       unlikeApod(apodData.date);
@@ -35,9 +36,7 @@ function APOD({ apodData }: APODProps) {
       <aside className="bg-[#f7f9fa]">
         <div
           className={`apod-sidebar-heart ${
-            likedApods.find((apodDate) => apodDate == apodData.date)
-              ? 'apod-sidebar-heart-liked'
-              : ''
+            likedApods.has(apodData.date) ? 'apod-sidebar-heart-liked' : ''
           }`}
           onClick={handleClick}
         >
@@ -54,10 +53,10 @@ function APOD({ apodData }: APODProps) {
         </div>
 
         <div className="w-full">
-          {apodData.thumbnail_url ? (
-            <iframe src={apodData.url} height="500px" width="100%"></iframe>
-          ) : (
+          {apodData.media_type == 'image' ? (
             <img src={apodData.url} alt={apodData.title}></img>
+          ) : (
+            <ReactPlayer url={apodData.url} width="100%" controls />
           )}
         </div>
       </div>

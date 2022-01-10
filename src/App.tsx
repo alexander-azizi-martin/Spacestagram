@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, forwardRef } from 'react';
 import axios from 'axios';
+import dayjs from 'dayjs';
 import { useStore } from '~/utils/store';
 import { APODData } from '~/types';
 
@@ -9,7 +10,52 @@ import APODList from '~/components/APODList';
 
 function App() {
   const [loading, apods] = useApods();
-  const searchQuery = useStore((state) => state.searchQuery);
+  const [searchQuery, filterOption, sortOption, likedApods] = useStore(
+    (state) => [
+      state.searchQuery,
+      state.filterOption,
+      state.sortOption,
+      state.likedApods,
+    ],
+  );
+
+  const filterApods = (apods: APODData[]) => {
+    return apods.filter((apod) => {
+      let filter = true;
+
+      switch (filterOption) {
+        case 'liked':
+          filter &&= likedApods.has(apod.date);
+          break;
+        case 'unliked':
+          filter &&= !likedApods.has(apod.date);
+          break;
+      }
+
+      if (searchQuery) {
+        filter &&= Boolean(apod.title.toLowerCase().match(searchQuery));
+      }
+
+      return filter;
+    });
+  };
+
+  const sortApods = (apods: APODData[]) => {
+    apods.sort((apod1, apod2) => {
+      const apod1Time = dayjs(apod1.date, 'YYYY-MM-DD');
+      const apod2time = dayjs(apod2.date, 'YYYY-MM-DD');
+
+      const result = Boolean(
+        sortOption == 'newest' ? apod1Time < apod2time : apod1Time > apod2time,
+      );
+
+      return result ? 1 : -1;
+    });
+
+    console.log(apods);
+
+    return apods;
+  };
 
   return (
     <>
@@ -18,11 +64,7 @@ function App() {
         {loading ? (
           <CircularProgress />
         ) : (
-          <APODList
-            apodList={apods.filter((apod) =>
-              apod.title.toLowerCase().match(searchQuery),
-            )}
-          />
+          <APODList apodList={sortApods(filterApods(apods))} />
         )}
       </main>
     </>
@@ -52,7 +94,12 @@ function useApods(): [boolean, APODData[]] {
         },
       })
       .then((res) => {
+        console.log(res.data);
         setApods(res.data);
+        setLoading(false);
+      })
+      .catch((error) => {
+        setApods([]);
         setLoading(false);
       });
   }, [startDate, endDate]);

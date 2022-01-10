@@ -1,5 +1,6 @@
 import create from 'zustand';
 import dayjs, { Dayjs } from 'dayjs';
+import { FilterOptions, SortOptions } from '~/types';
 
 type State = {
   searchQuery: string;
@@ -11,38 +12,56 @@ type State = {
   endDate: Dayjs;
   updateEndDate: (newDate: Dayjs) => void;
 
-  likedApods: string[];
+  likedApods: Set<string>;
   likeApod: (apodDate: string) => void;
   unlikeApod: (apodDate: string) => void;
+
+  filterOption: FilterOptions;
+  setFilterOption: (newFilter: FilterOptions) => void;
+
+  sortOption: SortOptions;
+  setSortOption: (newFilter: SortOptions) => void;
 };
 
-export const useStore = create<State>((set) => ({
+export const useStore = create<State>((set, get) => ({
   searchQuery: '',
   updateSearchQuery(newQuery: string) {
-    set((state) => ({ ...state, searchQuery: newQuery }));
+    set((state) => ({ searchQuery: newQuery }));
   },
 
-  startDate: dayjs().subtract(1, 'month').startOf('day'),
+  startDate: dayjs().subtract(1, 'day').startOf('day'),
   updateStartDate(newDate: Dayjs) {
-    set((state) => ({ ...state, startDate: newDate }));
+    set((state) => ({ startDate: newDate }));
   },
 
   endDate: dayjs().startOf('day'),
   updateEndDate(newDate: Dayjs) {
-    set((state) => ({ ...state, endDate: newDate }));
+    set((state) => ({ endDate: newDate }));
   },
 
-  likedApods: [],
+  likedApods: new Set(),
   likeApod(apodDate) {
-    set((state) => ({
-      ...state,
-      likedApods: state.likedApods.concat(apodDate),
-    }));
+    set((state) => {
+      likedApods: state.likedApods.add(apodDate);
+    });
   },
   unlikeApod(apodDate) {
-    set((state) => ({
-      ...state,
-      likedApods: state.likedApods.filter((apod) => apod != apodDate),
-    }));
+    set((state) => {
+      state.likedApods.delete(apodDate);
+
+      return {
+        likedApods: state.likedApods,
+      };
+    });
+  },
+
+  filterOption: 'all',
+  setFilterOption(newFilter) {
+    set((state) => ({ filterOption: newFilter }));
+  },
+
+  sortOption: 'newest',
+  setSortOption(newFilter) {
+    set((state) => ({ sortOption: newFilter }));
   },
 }));
