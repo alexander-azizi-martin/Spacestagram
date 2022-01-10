@@ -23,11 +23,11 @@ function Apod({ apodData }: ApodProps) {
     if (isLicked) {
       unlikeApod(apodData.date);
 
-      (event.target as HTMLElement).style['animation'] = '';
+      (event.currentTarget as HTMLElement).style['animation'] = '';
     } else {
       likeApod(apodData.date);
 
-      (event.target as HTMLElement).style['animation'] = 'like-animation 0.5s';
+      (event.currentTarget as HTMLElement).style['animation'] = 'like-animation 0.5s';
     }
   };
 
