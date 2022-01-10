@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import { useStore } from '~/utils/store';
 
+import ClickAwayListener from '@mui/material/ClickAwayListener';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
@@ -18,53 +19,38 @@ type DatePickerProps = {
 const DatePicker = function (props: DatePickerProps) {
   const [open, setOpen] = useState(false);
 
-  useEffect(() => {
-    const root = document.getElementById('root');
-
-    const clickListener = (event: Event) => {
-      // The popper material ui uses is placed outside the root element so
-      // if the click is coming from inside the root element its not from
-      // the popper; hence, the popper gets closed.
-      if (open && root?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-
-    document.body.addEventListener('click', clickListener);
-
-    return () => {
-      document.body.removeEventListener('click', clickListener);
-    };
-  }, [open]);
-
   return (
-    <DesktopDatePicker
-      disableHighlightToday
-      label={props.label}
-      value={props.date}
-      open={open}
-      shouldDisableDate={props.shouldDisableDate}
-      onChange={(newValue) => {
-        props.setDate(dayjs(newValue));
-        setOpen(false);
-      }}
-      renderInput={({ inputRef }) => (
-        <Tooltip title={props.label} describeChild arrow>
-          <button
-            className="flex items-center hover:bg-[#e7e7e7] hover:rounded h-11 p-2"
-            ref={inputRef}
-            onClick={() => {
-              setOpen(!open);
-            }}
-          >
-            <time className="truncate pr-2">
-              {props.date.format('MMM D, YYYY')}
-            </time>
-            <Calendar size={20} />
-          </button>
-        </Tooltip>
-      )}
-    />
+    <ClickAwayListener onClickAway={() => setOpen(false)}>
+      <div>
+        <DesktopDatePicker
+          disableHighlightToday
+          label={props.label}
+          value={props.date}
+          open={open}
+          shouldDisableDate={props.shouldDisableDate}
+          onChange={(newValue) => {
+            props.setDate(dayjs(newValue));
+            setOpen(false);
+          }}
+          renderInput={({ inputRef }) => (
+            <Tooltip title={props.label} describeChild arrow>
+              <button
+                className="flex items-center hover:bg-[#f6f7f8] hover:rounded h-11 p-2"
+                ref={inputRef}
+                onClick={() => {
+                  setOpen(!open);
+                }}
+              >
+                <time className="truncate pr-2">
+                  {props.date.format('MMM D, YYYY')}
+                </time>
+                <Calendar size={20} />
+              </button>
+            </Tooltip>
+          )}
+        />
+      </div>
+    </ClickAwayListener>
   );
 };
 
