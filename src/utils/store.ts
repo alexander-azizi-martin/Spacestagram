@@ -1,45 +1,49 @@
-import create from 'zustand';
+import create, { StateCreator, StoreApi } from 'zustand';
 import dayjs, { Dayjs } from 'dayjs';
 import { FilterOptions, SortOptions } from '~/types';
 
-type State = {
+type SearchSlice = {
   searchQuery: string;
   updateSearchQuery: (newQuery: string) => void;
-
-  startDate: Dayjs;
-  updateStartDate: (newDate: Dayjs) => void;
-
-  endDate: Dayjs;
-  updateEndDate: (newDate: Dayjs) => void;
-
-  likedApods: Set<string>;
-  likeApod: (apodDate: string) => void;
-  unlikeApod: (apodDate: string) => void;
-
-  filterOption: FilterOptions;
-  setFilterOption: (newFilter: FilterOptions) => void;
-
-  sortOption: SortOptions;
-  setSortOption: (newFilter: SortOptions) => void;
 };
 
-export const useStore = create<State>((set, get) => ({
+const createSearchSlice: StateCreator<SearchSlice> = (set, get) => ({
   searchQuery: '',
   updateSearchQuery(newQuery: string) {
     set((state) => ({ searchQuery: newQuery }));
   },
+});
 
+type DateRangeSlice = {
+  startDate: Dayjs;
+  endDate: Dayjs;
+
+  updateStartDate: (newDate: Dayjs) => void;
+  updateEndDate: (newDate: Dayjs) => void;
+};
+
+const createDateRangeSlice: StateCreator<DateRangeSlice> = (set, get) => ({
   startDate: dayjs().subtract(1, 'day').startOf('day'),
+  endDate: dayjs().startOf('day'),
+
   updateStartDate(newDate: Dayjs) {
     set((state) => ({ startDate: newDate }));
   },
-
-  endDate: dayjs().startOf('day'),
   updateEndDate(newDate: Dayjs) {
     set((state) => ({ endDate: newDate }));
   },
+});
 
+type LikedApodsSlice = {
+  likedApods: Set<string>;
+
+  likeApod: (apodDate: string) => void;
+  unlikeApod: (apodDate: string) => void;
+};
+
+const createLikedApodsSlice: StateCreator<LikedApodsSlice> = (set, get) => ({
   likedApods: new Set(),
+
   likeApod(apodDate) {
     set((state) => {
       likedApods: state.likedApods.add(apodDate);
@@ -54,14 +58,33 @@ export const useStore = create<State>((set, get) => ({
       };
     });
   },
+});
 
+type OptionsSlice = {
+  filterOption: FilterOptions;
+  sortOption: SortOptions;
+
+  setFilterOption: (newFilter: FilterOptions) => void;
+  setSortOption: (newFilter: SortOptions) => void;
+};
+
+const createOptionsSlice: StateCreator<OptionsSlice> = (set, get) => ({
   filterOption: 'all',
+  sortOption: 'newest',
+
   setFilterOption(newFilter) {
     set((state) => ({ filterOption: newFilter }));
   },
-
-  sortOption: 'newest',
   setSortOption(newFilter) {
     set((state) => ({ sortOption: newFilter }));
   },
+});
+
+type State = SearchSlice & DateRangeSlice & LikedApodsSlice & OptionsSlice;
+
+export const useStore = create<State>((set, get, api) => ({
+  ...createSearchSlice(set as any, get, api),
+  ...createDateRangeSlice(set as any, get, api),
+  ...createLikedApodsSlice(set as any, get, api),
+  ...createOptionsSlice(set as any, get, api),
 }));
