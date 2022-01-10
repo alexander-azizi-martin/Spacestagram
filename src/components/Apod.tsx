@@ -3,14 +3,14 @@ import ReactPlayer from 'react-player';
 import { Heart } from 'react-feather';
 import dayjs from 'dayjs';
 import { useStore } from '~/utils/store';
-import { APODData } from '~/types';
+import { ApodInfo } from '~/types';
 import '~/styles/APOD.css';
 
-type APODProps = {
-  apodData: APODData;
+type ApodProps = {
+  apodData: ApodInfo;
 };
 
-function APOD({ apodData }: APODProps) {
+function Apod({ apodData }: ApodProps) {
   const [likedApods, likeApod, unlikeApod] = useStore((state) => [
     state.likedApods,
     state.likeApod,
@@ -32,15 +32,14 @@ function APOD({ apodData }: APODProps) {
   };
 
   return (
-    <article className="apod">
+    <article className="Apod">
       <aside className="bg-[#f7f9fa]">
         <div
-          className={`apod-sidebar-heart ${
-            likedApods.has(apodData.date) ? 'apod-sidebar-heart-liked' : ''
+          className={`Apod-sidebar-heart ${
+            likedApods.has(apodData.date) ? 'Apod-sidebar-heart-liked' : ''
           }`}
-          onClick={handleClick}
         >
-          <Heart size={25} />
+          <Heart size={25} onClick={handleClick} />
         </div>
       </aside>
 
@@ -64,4 +63,4 @@ function APOD({ apodData }: APODProps) {
   );
 }
 
-export default APOD;
+export default Apod;

@@ -2,7 +2,6 @@ import React, { useState, useRef } from 'react';
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import Fade from '@mui/material/Fade';
 import { ChevronDown } from 'react-feather';
-import '~/styles/DropDown.css';
 
 type DropDownProps = {
   button: React.ReactElement;

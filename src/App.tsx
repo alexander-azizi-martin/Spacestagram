@@ -2,11 +2,11 @@ import React, { useState, useEffect, forwardRef } from 'react';
 import axios from 'axios';
 import dayjs from 'dayjs';
 import { useStore } from '~/utils/store';
-import { APODData } from '~/types';
+import { ApodInfo } from '~/types';
 
 import CircularProgress from '@mui/material/CircularProgress';
 import Header from '~/components/Header';
-import APODList from '~/components/APODList';
+import ApodList from '~/components/ApodList';
 
 function App() {
   const [loading, apods] = useApods();
@@ -19,7 +19,7 @@ function App() {
     ],
   );
 
-  const filterApods = (apods: APODData[]) => {
+  const filterApods = (apods: ApodInfo[]) => {
     return apods.filter((apod) => {
       let filter = true;
 
@@ -40,7 +40,7 @@ function App() {
     });
   };
 
-  const sortApods = (apods: APODData[]) => {
+  const sortApods = (apods: ApodInfo[]) => {
     apods.sort((apod1, apod2) => {
       const apod1Time = dayjs(apod1.date, 'YYYY-MM-DD');
       const apod2time = dayjs(apod2.date, 'YYYY-MM-DD');
@@ -52,8 +52,6 @@ function App() {
       return result ? 1 : -1;
     });
 
-    console.log(apods);
-
     return apods;
   };
 
@@ -64,14 +62,14 @@ function App() {
         {loading ? (
           <CircularProgress />
         ) : (
-          <APODList apodList={sortApods(filterApods(apods))} />
+          <ApodList apodList={sortApods(filterApods(apods))} />
         )}
       </main>
     </>
   );
 }
 
-function useApods(): [boolean, APODData[]] {
+function useApods(): [boolean, ApodInfo[]] {
   const [loading, setLoading] = useState(true);
   const [apods, setApods] = useState([]);
 

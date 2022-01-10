@@ -1,4 +1,4 @@
-export type APODData = {
+export type ApodInfo = {
   copyright: string;
   date: string;
   explanation: string;

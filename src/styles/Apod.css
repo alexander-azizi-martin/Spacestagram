@@ -1,4 +1,4 @@
-.apod {
+.Apod {
   display: grid;
   grid-template-columns: 40px 1fr;
 
@@ -10,7 +10,7 @@
   @apply w-full md:w-[640px]
 }
 
-.apod-sidebar-heart {
+.Apod-sidebar-heart {
   width: min-content;
   margin: 10px auto;
 
@@ -19,12 +19,12 @@
   transition: all;
 }
 
-.apod-sidebar-heart:hover {
+.Apod-sidebar-heart:hover {
   cursor: pointer;
   color: red;
 }
 
-.apod-sidebar-heart-liked svg {
+.Apod-sidebar-heart-liked svg {
   color: red;
   fill: red;
 }
