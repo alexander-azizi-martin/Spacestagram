@@ -3,6 +3,7 @@ import axios from 'axios';
 import dayjs from 'dayjs';
 import { useStore } from '~/utils/store';
 import { ApodInfo } from '~/types';
+import { useApods } from '~/utils/useApods';
 
 import CircularProgress from '@mui/material/CircularProgress';
 import Header from '~/components/Header';
@@ -67,42 +68,6 @@ function App() {
       </main>
     </>
   );
-}
-
-function useApods(): [boolean, ApodInfo[]] {
-  const [loading, setLoading] = useState(true);
-  const [apods, setApods] = useState([]);
-
-  const [startDate, endDate] = useStore((state) => [
-    state.startDate,
-    state.endDate,
-  ]);
-
-  useEffect(() => {
-    setLoading(true);
-    setApods([]);
-
-    axios
-      .get('https://api.nasa.gov/planetary/apod', {
-        params: {
-          api_key: import.meta.env.VITE_API_KEY,
-          start_date: startDate.format('YYYY-MM-DD'),
-          end_date: endDate.format('YYYY-MM-DD'),
-          thumbs: true,
-        },
-      })
-      .then((res) => {
-        console.log(res.data);
-        setApods(res.data);
-        setLoading(false);
-      })
-      .catch((error) => {
-        setApods([]);
-        setLoading(false);
-      });
-  }, [startDate, endDate]);
-
-  return [loading, apods];
 }
 
 export default App;
