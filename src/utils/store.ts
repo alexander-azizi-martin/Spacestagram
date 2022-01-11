@@ -1,4 +1,4 @@
-import create, { StateCreator, StoreApi } from 'zustand';
+import create, { StateCreator } from 'zustand';
 import dayjs, { Dayjs } from 'dayjs';
 import { FilterOptions, SortOptions } from '~/types';
 
@@ -23,7 +23,7 @@ type DateRangeSlice = {
 };
 
 const createDateRangeSlice: StateCreator<DateRangeSlice> = (set, get) => ({
-  startDate: dayjs().subtract(1, 'day').startOf('day'),
+  startDate: dayjs().subtract(10, 'days').startOf('day'),
   endDate: dayjs().startOf('day'),
 
   updateStartDate(newDate: Dayjs) {
@@ -42,16 +42,30 @@ type LikedApodsSlice = {
 };
 
 const createLikedApodsSlice: StateCreator<LikedApodsSlice> = (set, get) => ({
-  likedApods: new Set(),
+  likedApods: new Set(JSON.parse(localStorage.getItem('likedApods') || '[]')),
 
   likeApod(apodDate) {
     set((state) => {
-      likedApods: state.likedApods.add(apodDate);
+      state.likedApods.add(apodDate);
+
+      localStorage.setItem(
+        'likedApods',
+        JSON.stringify(Array.from(state.likedApods)),
+      );
+
+      return {
+        likedApods: state.likedApods,
+      };
     });
   },
   unlikeApod(apodDate) {
     set((state) => {
       state.likedApods.delete(apodDate);
+
+      localStorage.setItem(
+        'likedApods',
+        JSON.stringify(Array.from(state.likedApods)),
+      );
 
       return {
         likedApods: state.likedApods,
