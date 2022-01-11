@@ -1,4 +1,4 @@
-import React, { MouseEvent, useState } from 'react';
+import React, { MouseEvent } from 'react';
 import ReactPlayer from 'react-player';
 import { Heart } from 'react-feather';
 import dayjs from 'dayjs';
@@ -27,7 +27,8 @@ function Apod({ apodData }: ApodProps) {
     } else {
       likeApod(apodData.date);
 
-      (event.currentTarget as HTMLElement).style['animation'] = 'like-animation 0.5s';
+      (event.currentTarget as HTMLElement).style['animation'] =
+        'like-animation 0.5s';
     }
   };
 
@@ -53,9 +54,15 @@ function Apod({ apodData }: ApodProps) {
 
         <div className="w-full">
           {apodData.media_type == 'image' ? (
-            <img src={apodData.url} alt={apodData.title}></img>
+            <img className="w-full" src={apodData.url} alt={apodData.title} />
           ) : (
-            <ReactPlayer url={apodData.url} width="100%" controls />
+            <ReactPlayer
+              url={apodData.url}
+              width="100%"
+              light={apodData.thumbnail_url}
+              controls
+              playing
+            />
           )}
         </div>
       </div>
