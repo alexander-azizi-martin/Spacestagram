@@ -8,7 +8,7 @@ type ApodListProps = {
 
 function ApodList({ apodList }: ApodListProps) {
   return (
-    <div className="flex flex-col gap-y-5">
+    <div className="flex flex-col gap-y-5 overflow-hidden">
       {apodList.map((apodData) => (
         <Apod apodData={apodData} key={apodData.date} />
       ))}

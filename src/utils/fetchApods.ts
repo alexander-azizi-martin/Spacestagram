@@ -8,15 +8,19 @@ import Cache from '~/utils/cache';
 const MAX_CASH_SIZE = 1000;
 const cache = new Cache<number, ApodInfo>(MAX_CASH_SIZE);
 
-const SECONDS_IN_DAY = 60 * 60 * 24;
+export const SECONDS_IN_DAY = 60 * 60 * 24;
 
 async function fetchApods(start: Dayjs, end: Dayjs): Promise<ApodInfo[]> {
   let apods: ApodInfo[] = [];
 
   let request: number | undefined;
 
-  const start_unix = start.startOf('day').unix();
-  const end_unix = end.startOf('day').unix();
+  let start_unix = start.startOf('day').unix();
+  let end_unix = end.startOf('day').unix();
+
+  if (end_unix < start_unix) {
+    [start_unix, end_unix] = [end_unix, start_unix];
+  }
 
   for (let day = start_unix; day <= end_unix; day += SECONDS_IN_DAY) {
     if (cache.has(day)) {
@@ -43,7 +47,7 @@ async function fetchApods(start: Dayjs, end: Dayjs): Promise<ApodInfo[]> {
         apods.push(apod);
         cache.set(dayjs(apod.date, 'YYYY-MM-DD').unix(), apod);
       }
-      
+
       // Requests apod's image
       await Promise.all(
         resData.map((apod) => {
@@ -68,25 +72,4 @@ async function fetchApods(start: Dayjs, end: Dayjs): Promise<ApodInfo[]> {
   return apods;
 }
 
-function useApods(): [boolean, ApodInfo[]] {
-  const [startDate, endDate] = useStore((state) => [
-    state.startDate,
-    state.endDate,
-  ]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [apods, setApods] = useState<ApodInfo[]>([]);
-
-  useEffect(() => {
-    setLoading(true);
-
-    fetchApods(startDate, endDate)
-      .then((apods) => {
-        setApods(apods);
-        setLoading(false);
-      })
-  }, [startDate, endDate]);
-
-  return [loading, apods];
-}
-
-export { useApods, fetchApods };
+export default fetchApods;
