@@ -1,5 +1,5 @@
 import React, { useState, useEffect, forwardRef } from 'react';
-import axios from 'axios';
+import escapeStringRegexp from 'escape-string-regexp';
 import dayjs, { Dayjs } from 'dayjs';
 import { useStore } from '~/utils/store';
 import { ApodInfo } from '~/types';
@@ -36,7 +36,7 @@ function App() {
           return false;
         } else if (
           searchQuery &&
-          !apod.title.toLowerCase().match(searchQuery)
+          !apod.title.toLowerCase().match(escapeStringRegexp(searchQuery))
         ) {
           return false;
         }
@@ -113,6 +113,7 @@ function App() {
   }, [startDate, endDate]);
 
   const num_apods = (endDate.unix() - startDate.unix()) / SECONDS_IN_DAY + 1;
+  const filtered = filterOption != 'all' || !!searchQuery;
 
   return (
     <>
@@ -122,7 +123,7 @@ function App() {
           className="flex flex-col items-center gap-y-5"
           dataLength={apods.length}
           next={fetchNextApods}
-          hasMore={num_apods != apods.length}
+          hasMore={num_apods != apods.length && !filtered}
           initialScrollY={100}
           scrollThreshold="0px"
           loader={<CircularProgress />}
