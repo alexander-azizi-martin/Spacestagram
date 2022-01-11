@@ -54,9 +54,10 @@ const DatePicker = function (props: DatePickerProps) {
   );
 };
 
-function DateRangePicker() {
-  const today = dayjs();
+const firstDate = dayjs('1995-06-16', 'YYYY-MM-DD');
+const today = dayjs();
 
+function DateRangePicker() {
   const [openStart, setOpenStart] = useState(false);
   const [openEnd, setOpenEnd] = useState(false);
 
@@ -74,7 +75,7 @@ function DateRangePicker() {
           label="Start Date"
           date={startDate}
           setDate={setStartDate}
-          shouldDisableDate={(date) => endDate < date}
+          shouldDisableDate={(date) => date < firstDate || endDate < date}
         />
 
         <span className="mx-2">to</span>
