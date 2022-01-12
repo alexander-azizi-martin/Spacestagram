@@ -154,9 +154,9 @@ function App() {
         }
 
         // Prevents more request being sent
-        if (sortOption == "newest") {
+        if (sortOption == 'newest') {
           updateStartDate(cursor);
-        } else if (sortOption == "oldest") {
+        } else if (sortOption == 'oldest') {
           updateEndDate(cursor);
         }
       });
@@ -185,9 +185,9 @@ function App() {
 
   let showLoadMonth: boolean;
   if (sortOption == 'newest') {
-    showLoadMonth = !startDate.isSame(firstDate);
+    showLoadMonth = !startDate.isSame(firstDate, 'day');
   } else {
-    showLoadMonth = !endDate.isSame(today);
+    showLoadMonth = !endDate.isSame(today, 'day');
   }
 
   useEffect(() => {
@@ -214,14 +214,28 @@ function App() {
     }
   }, [startDate, endDate, sortOption]);
 
-  const num_apods = (endDate.unix() - startDate.unix()) / SECONDS_IN_DAY + 1;
+  const hasMore = () => {
+    const numApods =
+      Math.round((endDate.unix() - startDate.unix()) / SECONDS_IN_DAY) + 1;
+    let hasMore: boolean;
+    if (sortOption == 'newest') {
+      hasMore = !cursor.isSame(startDate, 'day') || 1 > apods.length;
+    } else {
+      hasMore = !cursor.isSame(endDate, 'day') || 1 > apods.length;
+    }
 
-  // InfiniteScroll component won't trigger without a scroll event
-  // even if it is at the bottom of the page
-  const hasMore = num_apods != apods.length;
-  if (hasMore) {
-    window.dispatchEvent(new CustomEvent('scroll'));
-  }
+    return hasMore;
+  };
+
+  useEffect(() => {
+    // InfiniteScroll component won't trigger without a scroll event
+    // even if it is at the bottom of the page
+    if (hasMore()) {
+      window.dispatchEvent(new CustomEvent('scroll'));
+    }
+  });
+  
+  const selectedApods = selectApods(apods);
 
   return (
     <>
@@ -229,10 +243,9 @@ function App() {
       <main id="main" className="flex justify-center p-[20px]">
         <InfiniteScroll
           className="flex flex-1 flex-col items-center gap-y-5"
-          dataLength={apods.length}
+          dataLength={Math.random()}
           next={fetchNextApods}
-          hasMore={hasMore}
-          initialScrollY={100}
+          hasMore={hasMore()}
           scrollThreshold="0px"
           endMessage={
             showLoadMonth ? (
@@ -249,9 +262,9 @@ function App() {
           }
           loader={<CircularProgress />}
         >
-          <ApodList apodList={selectApods(apods)} />
+          <ApodList apodList={selectedApods} />
         </InfiniteScroll>
-        {apods.length != 0 && (
+        {selectedApods.length > 1 && (
           <div className="hidden lg:block flex-0 sticky top-0 h-[100vh] self-start">
             <div className="sticky top-[calc(100vh-60px)] w-max">
               <div className="relative left-10">
