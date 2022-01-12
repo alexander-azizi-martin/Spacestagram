@@ -1,9 +1,11 @@
-import React, { MouseEvent } from 'react';
+import React, { useState, MouseEvent } from 'react';
 import ReactPlayer from 'react-player';
 import { Heart } from 'react-feather';
 import dayjs from 'dayjs';
 import { useStore } from '~/utils/store';
 import { ApodInfo } from '~/types';
+import Button from '@mui/material/Button';
+import Collapse from '@mui/material/Collapse';
 import '~/styles/Apod.css';
 
 type ApodProps = {
@@ -16,6 +18,8 @@ function Apod({ apodData }: ApodProps) {
     state.likeApod,
     state.unlikeApod,
   ]);
+
+  const [showDescription, setShowDescription] = useState(false);
 
   const handleClick = (event: MouseEvent) => {
     const isLicked = likedApods.has(apodData.date);
@@ -64,6 +68,23 @@ function Apod({ apodData }: ApodProps) {
               playing
             />
           )}
+        </div>
+        <div>
+          <div className="flex justify-between items-center">
+            <Button
+              onClick={() => {
+                setShowDescription(!showDescription);
+              }}
+            >
+              Learn More
+            </Button>
+            {apodData.copyright && (
+              <div className="text-xs pr-2">By {apodData.copyright}</div>
+            )}
+          </div>
+          <Collapse in={showDescription}>
+            <div className="px-5 py-3">{apodData.explanation}</div>
+          </Collapse>
         </div>
       </div>
     </article>
