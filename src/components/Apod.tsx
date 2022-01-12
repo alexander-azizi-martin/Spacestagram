@@ -4,7 +4,7 @@ import { Heart } from 'react-feather';
 import dayjs from 'dayjs';
 import { useStore } from '~/utils/store';
 import { ApodInfo } from '~/types';
-import '~/styles/APOD.css';
+import '~/styles/Apod.css';
 
 type ApodProps = {
   apodData: ApodInfo;
