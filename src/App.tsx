@@ -1,14 +1,26 @@
 import React, { useState, useEffect, forwardRef } from 'react';
 import escapeStringRegexp from 'escape-string-regexp';
+import { AxiosError } from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
 import { useStore } from '~/utils/store';
 import { ApodInfo } from '~/types';
 import fetchApods, { SECONDS_IN_DAY } from '~/utils/fetchApods';
-
 import InfiniteScroll from 'react-infinite-scroll-component';
 import CircularProgress from '@mui/material/CircularProgress';
+import Alert, { AlertColor } from '@mui/material/Alert';
+import Slide from '@mui/material/Slide';
+import Button from '@mui/material/Button';
+import { X as CloseIcon, Plus } from 'react-feather';
 import Header from '~/components/Header';
 import ApodList from '~/components/ApodList';
+
+type Alert = {
+  message: string;
+  severity: AlertColor;
+};
+
+const firstDate = dayjs('1995-06-16', 'YYYY-MM-DD');
+const today = dayjs().startOf('day');
 
 function App() {
   const [
@@ -18,6 +30,8 @@ function App() {
     likedApods,
     startDate,
     endDate,
+    updateStartDate,
+    updateEndDate,
   ] = useStore((state) => [
     state.searchQuery,
     state.filterOption,
@@ -25,6 +39,8 @@ function App() {
     state.likedApods,
     state.startDate,
     state.endDate,
+    state.updateStartDate,
+    state.updateEndDate,
   ]);
 
   const selectApods = (apods: ApodInfo[]) => {
@@ -70,12 +86,13 @@ function App() {
     });
   };
 
+  const [alert, setAlert] = useState<Alert>();
   const [cursor, setCursor] = useState(
     sortOption == 'newest' ? endDate : startDate,
   );
   const [apods, setApods] = useState<ApodInfo[]>([]);
   const fetchNextApods = () => {
-    console.log('Fetching apods');
+    console.log('Fetching data');
     let nextCursor: Dayjs;
 
     if (sortOption == 'newest') {
@@ -84,7 +101,7 @@ function App() {
       if (!nextCursor.isAfter(startDate)) {
         nextCursor = startDate;
       }
-    } else if (sortOption == 'oldest') {
+    } else {
       nextCursor = cursor.add(5, 'days');
 
       if (!nextCursor.isBefore(endDate)) {
@@ -92,44 +109,176 @@ function App() {
       }
     }
 
-    fetchApods(cursor, nextCursor).then((newApods) => {
-      setApods(removeDuplicates(apods.concat(newApods)));
+    let timeoutID: NodeJS.Timeout | null = setTimeout(() => {
+      timeoutID = null;
 
-      setCursor(nextCursor);
-    });
+      setAlert({
+        message: "It is taking a while to load data from Nasa's servers",
+        severity: 'warning',
+      });
+    }, 15000);
+
+    fetchApods(cursor, nextCursor)
+      .then((newApods) => {
+        if (timeoutID) {
+          clearTimeout(timeoutID);
+        }
+
+        setApods(removeDuplicates(apods.concat(newApods)));
+        setCursor(nextCursor);
+      })
+      .catch((error) => {
+        const errorType = error.response.status / 100;
+
+        switch (errorType) {
+          case 5:
+            setAlert({
+              message:
+                'Something went wrong with Nasa servers while fetching api data try refreshing the page',
+              severity: 'error',
+            });
+            break;
+          case 4:
+            setAlert({
+              message:
+                "Something went wrong while fetching data from Nasa's api try refreshing the page",
+              severity: 'error',
+            });
+            break;
+          default:
+            setAlert({
+              message: 'Unknown error occurred',
+              severity: 'error',
+            });
+            break;
+        }
+
+        // Prevents more request being sent
+        if (sortOption == "newest") {
+          updateStartDate(cursor);
+        } else if (sortOption == "oldest") {
+          updateEndDate(cursor);
+        }
+      });
   };
 
-  // For some reason the InfiniteScroll component won't send an initial data request
-  // so this is for making the initial request
-  const [initialLoad, setInitialLoad] = useState(false);
-  useEffect(() => {
-    fetchNextApods();
-  }, [initialLoad]);
+  const [loadedMonth, setLoadedMonth] = useState(false);
+  const loadMonth = () => {
+    if (sortOption == 'newest') {
+      let nextStartDate = startDate.subtract(1, 'month');
+      if (!nextStartDate.isAfter(firstDate)) {
+        nextStartDate = firstDate;
+      }
+
+      updateStartDate(nextStartDate);
+    } else if (sortOption == 'oldest') {
+      let nextEndDate = endDate.add(1, 'month');
+      if (!nextEndDate.isBefore(today)) {
+        nextEndDate = today;
+      }
+
+      updateEndDate(nextEndDate);
+    }
+
+    setLoadedMonth(true);
+  };
+
+  let showLoadMonth: boolean;
+  if (sortOption == 'newest') {
+    showLoadMonth = !startDate.isSame(firstDate);
+  } else {
+    showLoadMonth = !endDate.isSame(today);
+  }
 
   useEffect(() => {
-    setInitialLoad(!initialLoad);
-    setCursor(sortOption == 'newest' ? endDate : startDate);
-    setApods([]);
-  }, [startDate, endDate]);
+    if (alert) {
+      let timeoutID: NodeJS.Timeout | null = setTimeout(() => {
+        timeoutID = null;
+        setAlert(undefined);
+      }, 10000);
+
+      return () => {
+        if (timeoutID) {
+          clearTimeout(timeoutID);
+        }
+      };
+    }
+  }, [alert]);
+
+  useEffect(() => {
+    if (!loadedMonth) {
+      setCursor(sortOption == 'newest' ? endDate : startDate);
+      setApods([]);
+    } else {
+      setLoadedMonth(false);
+    }
+  }, [startDate, endDate, sortOption]);
 
   const num_apods = (endDate.unix() - startDate.unix()) / SECONDS_IN_DAY + 1;
-  const filtered = filterOption != 'all' || !!searchQuery;
+
+  // InfiniteScroll component won't trigger without a scroll event
+  // even if it is at the bottom of the page
+  const hasMore = num_apods != apods.length;
+  if (hasMore) {
+    window.dispatchEvent(new CustomEvent('scroll'));
+  }
 
   return (
     <>
       <Header />
-      <main id="main" className="flex items-center justify-center p-[20px]">
+      <main id="main" className="flex justify-center p-[20px]">
         <InfiniteScroll
-          className="flex flex-col items-center gap-y-5"
+          className="flex flex-1 flex-col items-center gap-y-5"
           dataLength={apods.length}
           next={fetchNextApods}
-          hasMore={num_apods != apods.length && !filtered}
+          hasMore={hasMore}
           initialScrollY={100}
           scrollThreshold="0px"
+          endMessage={
+            showLoadMonth ? (
+              <Button
+                variant="outlined"
+                startIcon={<Plus size={20} />}
+                onClick={loadMonth}
+              >
+                Load Another Month
+              </Button>
+            ) : (
+              <div>No More to Load</div>
+            )
+          }
           loader={<CircularProgress />}
         >
           <ApodList apodList={selectApods(apods)} />
         </InfiniteScroll>
+        {apods.length != 0 && (
+          <div className="hidden lg:block flex-0 sticky top-0 h-[100vh] self-start">
+            <div className="sticky top-[calc(100vh-60px)] w-max">
+              <div className="relative left-10">
+                <Button
+                  onClick={() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  }}
+                >
+                  Back to Top
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+        {alert != undefined && (
+          <Slide className="absolute bottom-10" direction="up" in={true}>
+            <Alert
+              style={{ position: 'fixed' }}
+              severity={alert.severity}
+              onClose={() => {
+                setAlert(undefined);
+              }}
+            >
+              <div className="flex items-center h-full">{alert.message}</div>
+            </Alert>
+          </Slide>
+        )}
       </main>
     </>
   );
