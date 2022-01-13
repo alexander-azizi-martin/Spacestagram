@@ -1,11 +1,11 @@
 # Spacestagram
 
-Spacestagram is a frontend website that displays Nasa's astronomy picture of the day (APOD). The website was built using Vite, React, Typescript, and tailwind. The website can be viewed at [spacestagram2.netlify.app](https://spacestagram2.netlify.app).
+Spacestagram is a frontend website that displays Nasa's astronomy picture of the day (APOD). The website was built using Vite, React, Typescript, Tailwind, and Material UI. The website can be viewed at [spacestagram2.netlify.app](https://spacestagram2.netlify.app).
 
 ## Features
 
-- Like your favorite APODs (likes persist between page loads)
-- Date range picker to select which APODs to view
+- Like your favorite APODs by clicking on the heart (likes persist between page loads)
+- Date range picker to select which APODs to view by clicking on the dates in the top right
 - Filter by liked and unliked APODs
 - Sort by new and old APODs
 - Search APODs by their title
