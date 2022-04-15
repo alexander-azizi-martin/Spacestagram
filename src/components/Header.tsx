@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { ArrowUp, ArrowDown, Heart } from 'react-feather';
 import { useStore } from '~/utils/store';
-import FilterDropDown from '~/components/DropDowns/FilterDropDown';
-import SortDropDown from '~/components/DropDowns/SortDropDown';
+import FilterDropDown from '~/components/FilterDropDown';
+import SortDropDown from '~/components/SortDropDown';
 import SearchBar from '~/components/SearchBar';
 import DateRangePicker from '~/components/DateRangePicker';
 
