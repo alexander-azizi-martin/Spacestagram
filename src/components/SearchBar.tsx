@@ -11,6 +11,7 @@ function SearchBar() {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     let value = event.target.value;
 
+    // Removes double spaces at start and end of input
     if (value.startsWith('  ')) {
       value = value.slice(1);
     }

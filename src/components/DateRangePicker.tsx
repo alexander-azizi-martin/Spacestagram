@@ -1,13 +1,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
-import { useStore } from '~/utils/store';
-
 import ClickAwayListener from '@mui/material/ClickAwayListener';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import DesktopDatePicker from '@mui/lab/DesktopDatePicker';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import Tooltip from '@mui/material/Tooltip';
 import { Calendar } from 'react-feather';
+import { useStore } from '~/utils/store';
 
 type DatePickerProps = {
   label: string;
@@ -16,7 +15,7 @@ type DatePickerProps = {
   shouldDisableDate: (date: Dayjs) => boolean;
 };
 
-const DatePicker = function (props: DatePickerProps) {
+function DatePicker (props: DatePickerProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -54,8 +53,8 @@ const DatePicker = function (props: DatePickerProps) {
   );
 };
 
-const firstDate = dayjs('1995-06-16', 'YYYY-MM-DD');
-const today = dayjs();
+const FIRST_DAY = dayjs('1995-06-16', 'YYYY-MM-DD');
+const TODAY = dayjs();
 
 function DateRangePicker() {
   const [openStart, setOpenStart] = useState(false);
@@ -75,7 +74,7 @@ function DateRangePicker() {
           label="Start Date"
           date={startDate}
           setDate={setStartDate}
-          shouldDisableDate={(date) => date < firstDate || endDate < date}
+          shouldDisableDate={(date) => date < FIRST_DAY || endDate < date}
         />
 
         <span className="mx-2">to</span>
@@ -84,7 +83,7 @@ function DateRangePicker() {
           label="End Date"
           date={endDate}
           setDate={setEndDate}
-          shouldDisableDate={(date) => today < date || date < startDate}
+          shouldDisableDate={(date) => TODAY < date || date < startDate}
         />
       </LocalizationProvider>
     </div>
