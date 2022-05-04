@@ -1,25 +1,17 @@
 import React, { useState, useEffect, ChangeEvent } from 'react';
+import escapeStringRegexp from 'escape-string-regexp';
 import { Search } from 'react-feather';
 import { useStore } from '~/utils/store';
 
 function SearchBar() {
-  const [searchQuery, setQuery] = useStore((state) => [
-    state.searchQuery,
-    state.updateSearchQuery,
-  ]);
+  const [setStoreQuery] = useStore((state) => [state.updateSearchQuery]);
+  const [query, setQuery] = useState('');
 
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    let value = event.target.value;
+    const { value } = event.target;
 
-    // Removes double spaces at start and end of input
-    if (value.startsWith('  ')) {
-      value = value.slice(1);
-    }
-    if (value.endsWith('  ')) {
-      value = value.slice(0, -1);
-    }
-
-    setQuery(value.toLowerCase());
+    setQuery(value);
+    setStoreQuery(escapeStringRegexp(value.trim()));
   };
 
   return (
@@ -29,7 +21,7 @@ function SearchBar() {
       </div>
 
       <input
-        value={searchQuery}
+        value={query}
         onChange={handleChange}
         className="w-full h-9 bg-inherit focus:text-black"
         placeholder="Search"
