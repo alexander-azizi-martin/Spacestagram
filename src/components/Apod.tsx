@@ -2,10 +2,11 @@ import React, { useState, MouseEvent } from 'react';
 import ReactPlayer from 'react-player';
 import { Heart } from 'react-feather';
 import dayjs from 'dayjs';
-import { useStore } from '~/utils/store';
-import { ApodInfo } from '~/types';
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
+import { Highlight } from '@mantine/core';
+import { useStore } from '~/utils/store';
+import { ApodInfo } from '~/types';
 import '~/styles/Apod.css';
 
 type ApodProps = {
@@ -13,7 +14,8 @@ type ApodProps = {
 };
 
 function Apod({ apodData }: ApodProps) {
-  const [likedApods, likeApod, unlikeApod] = useStore((state) => [
+  const [searchQuery, likedApods, likeApod, unlikeApod] = useStore((state) => [
+    state.searchQuery,
     state.likedApods,
     state.likeApod,
     state.unlikeApod,
@@ -50,7 +52,14 @@ function Apod({ apodData }: ApodProps) {
 
       <div className="bg-white">
         <div className="flex justify-between items-end m-2.5">
-          <h3 className="text-xl font-medium leading-none">{apodData.title}</h3>
+          <Highlight
+            highlight={searchQuery}
+            component="h3"
+            className="text-xl font-medium leading-none"
+          >
+            {apodData.title}
+          </Highlight>
+          
           <time className="text-xs">
             {dayjs(apodData.date, 'YYYY-MM-DD').format('MMM D, YYYY')}
           </time>
