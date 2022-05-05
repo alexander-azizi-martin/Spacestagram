@@ -2,9 +2,7 @@ import React, { useState, MouseEvent } from 'react';
 import ReactPlayer from 'react-player';
 import { Heart } from 'react-feather';
 import dayjs from 'dayjs';
-import Button from '@mui/material/Button';
-import Collapse from '@mui/material/Collapse';
-import { Highlight } from '@mantine/core';
+import { Highlight, Button, Collapse } from '@mantine/core';
 import { useStore } from '~/utils/store';
 import { ApodInfo } from '~/types';
 import '~/styles/Apod.css';
@@ -59,7 +57,7 @@ function Apod({ apodData }: ApodProps) {
           >
             {apodData.title}
           </Highlight>
-          
+
           <time className="text-xs">
             {dayjs(apodData.date, 'YYYY-MM-DD').format('MMM D, YYYY')}
           </time>
@@ -81,6 +79,8 @@ function Apod({ apodData }: ApodProps) {
         <div>
           <div className="flex justify-between items-center">
             <Button
+              variant='subtle'
+              radius={0}
               onClick={() => {
                 setShowDescription(!showDescription);
               }}

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import escapeStringRegexp from 'escape-string-regexp';
 import { Search } from 'react-feather';
 import { useStore } from '~/utils/store';

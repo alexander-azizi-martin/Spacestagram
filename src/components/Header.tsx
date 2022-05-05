@@ -18,7 +18,7 @@ function Header() {
         </div>
       </div>
 
-      <div className="flex-1 max-w-[500px]">
+      <div className="flex-1 max-w-[500px] w-full">
         <SearchBar />
       </div>
 
